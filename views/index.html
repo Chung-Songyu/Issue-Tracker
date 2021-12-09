@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Issue Tracker</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../public/style.css">
+  </head>
+
+  <body>
+    <header>
+      <h1 id="header">Issue Tracker</h1>
+    </header>
+    <section class="exampleSection">
+      <div class="grid" id="exampleUsage">
+        <h3>Example <span class="highlight">GET</span> usage</h3>
+        <code>/api/issues/{project}</code><br>
+        <code>/api/issues/{project}?open=true&amp;assigned_to=Joe</code><br>
+      </div>
+      <div class="grid" id="exampleLink">
+        <h3>Examples</h3>
+        Go to <a href='/api/issues/apitest/'><code>/api/issues/apitest/</code></a> project
+      </div>
+      <div class="grid" id="exampleReturn">
+        <h3>Example return</h3>
+        <pre id="returnCode"><code>
+        [
+          {
+            "_id": "5871dda29faedc3491ff93bb",
+            "issue_title": "Fix error in posting data",
+            "issue_text": "When we post data it has an error.",
+            "created_on": "2017-01-08T06:35:14.240Z",
+            "updated_on": "2017-01-08T06:35:14.240Z",
+            "created_by": "Joe",
+            "assigned_to": "Joe",
+            "open": true,
+            "status_text": "In QA"
+          },
+          ...
+        ]
+        </code></pre>
+      </div>
+    </section>
+    <hr>
+    <section>
+      <h2>Issue Form for <span class="highlight">apitest</span> Project</h2>
+      <div class="testUi">
+        <div class="grid" id="issueSubmit">
+          <h3>SUBMIT</i></h3>
+          <form id="testForm" class="border">
+            <input type="text" name="issue_title" placeholder="(req) Title"><br>
+            <textarea type="text" name="issue_text" placeholder="(req) Text" class="submitTextarea"></textarea><br>
+            <input type="text" name="created_by" placeholder="(req) Created by"><br>
+            <input type="text" name="assigned_to" placeholder="(opt) Assigned to"><br>
+            <input type="text" name="status_text" placeholder="(opt) Status text"><br>
+            <button type="submit">Submit</button>
+            <p id="submitText">* Please note down the _id provided below for future reference.</p>
+          </form>
+        </div>
+        <div class="grid" id="issueUpdate">
+          <h3>UPDATE</h3>
+          <form id="testForm2" class="border">
+            <input type="text" name="_id" placeholder="(req) _id"><br>
+            <input type="text" name="issue_title" placeholder="(opt) Title"><br>
+            <textarea type="text" name="issue_text" placeholder="(opt) Text"></textarea><br>
+            <input type="text" name="created_by" placeholder="(opt) Created by"><br>
+            <input type="text" name="assigned_to" placeholder="(opt) Assigned to"><br>
+            <input type="text" name="status_text" placeholder="(opt) Status text"><br>
+            <label><input type="checkbox" name="open" value="false">Check to close issue</label><br>
+            <button type="submit">Update</button>
+          </form>
+        </div>
+        <div class="grid" id="issueDelete">
+          <h3>DELETE</i></h3>
+          <form id="testForm3" class="border">
+            <input type="text" name="_id" placeholder="(req) _id"><br>
+            <button type="submit">Delete</button>
+          </form>
+        </div>
+      </div>
+    </section>
+    <div class="grid" id="serverBox">
+      <h3>SERVER RESPONSE</h3>
+      <div id='jsonResult'></div>
+    </div>
+    <hr>
+    <script src="https://code.jquery.com/jquery-2.2.1.min.js"
+            integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
+            crossorigin="anonymous"></script>
+    <script>
+      $(() => {
+        $('#testForm').submit((e) => {
+          $.ajax({
+            url: '/api/issues/apitest',
+            type: 'POST',
+            data: $('#testForm').serialize(),
+            success: (data) => {
+              $('#jsonResult').text(JSON.stringify(data));
+            }
+          });
+          e.preventDefault();
+        });
+        $('#testForm2').submit((e) => {
+          $.ajax({
+            url: '/api/issues/apitest',
+            type: 'PUT',
+            data: $('#testForm2').serialize(),
+            success: (data) => {
+              $('#jsonResult').text(JSON.stringify(data));
+            }
+          });
+          e.preventDefault();
+        });
+        $('#testForm3').submit((e) => {
+          $.ajax({
+            url: '/api/issues/apitest',
+            type: 'DELETE',
+            data: $('#testForm3').serialize(),
+            success: (data) => {
+              $('#jsonResult').text(JSON.stringify(data));
+            }
+          });
+          e.preventDefault();
+        });
+      });
+    </script>
+  </body>
+</html>

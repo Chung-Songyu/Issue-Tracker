@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Issue Tracker - Project Page</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../public/style.css">
+  </head>
+
+  <body>
+    <header>
+      <h1 id='projectTitle'></h1>
+    </header>
+    <div id="projectIssues">
+      <div class="grid" id='submitNewIssue'>
+        <br>
+        <h3>SUBMIT a new issue</h3>
+        <form id="newIssue">
+          <input type="text" name="issue_title" placeholder="(req) Title"><br>
+          <textarea type="text" name="issue_text" placeholder="(req) Text" class="submitTextarea"></textarea><br>
+          <input type="text" name="created_by" placeholder="(req) Created by"><br>
+          <input type="text" name="assigned_to" placeholder="(opt) Assigned to"><br>
+          <input type="text" name="status_text" placeholder="(opt) Status text"><br>
+          <button type="submit">SUBMIT</button>
+        </form>
+      </div>
+      <div id='issueDisplay'></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-2.2.1.min.js"
+            integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
+            crossorigin="anonymous"></script>
+    <script>
+      $(() => {
+        let currentProject = window.location.pathname.replace(/\//g, "");;
+        let url = "/api/issues/" + currentProject;
+        $('#projectTitle').html('All issues for: <span class="highlight">' + currentProject + '</span>');
+        $.ajax({
+          type: "GET",
+          url: url,
+          success: (data) => {
+            let issues= [];
+            data.forEach((ele) => {
+              let openstatus = ele.open? 'open':'closed';
+              let single = [
+                '<div class="issue ' + openstatus + '">',
+                '<h3 class="highlight">' + ele.issue_title + ' -  (' + openstatus + ')</h3>',
+                '<p><b>Issue:</b> ' + ele.issue_text + '</p>',
+                '<p><b>Status:</b> ' + ele.status_text + '</p>',
+                '<p class="id"><b>_id:</b> ' + ele._id,
+                '<br><b>Created by:</b> ' + ele.created_by,
+                '<br><b>Assigned to:</b> ' + ele.assigned_to,
+                '<br><b>Created on:</b> ' + new Date(ele.created_on).toLocaleString(),
+                '<br><b>Last updated:</b> ' + new Date(ele.updated_on).toLocaleString(),
+                '<br><a href="#" class="closeIssue" id="' + ele._id + '">close?</a> | <a href="#" class="deleteIssue" id="' + ele._id + '">delete?</a></p>',
+                '</div>'
+              ];
+              issues.push(single.join(''));
+            });
+            $('#issueDisplay').html(issues.join(''));
+          }
+        });
+
+        $('#newIssue').submit(function(e) {
+          $(this).attr('action', url);
+          $.ajax({
+            type: "POST",
+            url: url,
+            data: $(this).serialize(),
+            success: function(data) {
+              window.location.reload(true);
+            }
+          });
+        });
+
+        $('#issueDisplay').on('click','.closeIssue', function(e) {
+          $.ajax({
+            type: "PUT",
+            url: url,
+            data: {_id: $(this).attr('id'), open: false},
+            success: function(data) {
+              alert("Issue id: " + data._id + " closed.");
+              window.location.reload(true);
+            }
+          });
+        });
+
+        $('#issueDisplay').on('click','.deleteIssue', function(e) {
+          $.ajax({
+            type: "DELETE",
+            url: url,
+            data: {_id: $(this).attr('id')},
+            success: function(data) {
+              alert("Issue id: " + data._id + " deleted.");
+              window.location.reload(true);
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
